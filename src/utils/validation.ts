@@ -101,3 +101,14 @@ export function validateLoginInput(email: string, password: string): { isValid: 
   }
   return { isValid: true, error: null };
 }
+
+/**
+ * Sanitizes input text by stripping HTML tags and trimming.
+ * Helps prevent XSS injections when displaying data or sending it to APIs.
+ */
+export function sanitizeText(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/<[^>]*>/g, '')
+    .trim();
+}

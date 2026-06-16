@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateRequired, validateEmail, validateNumericInput } from '../utils/validation';
+import { validateRequired, validateEmail, validateNumericInput, sanitizeText } from '../utils/validation';
 
 describe('Form Validation Utility Tests', () => {
   describe('validateRequired', () => {
@@ -56,6 +56,25 @@ describe('Form Validation Utility Tests', () => {
       expect(validateNumericInput(0)).toEqual({ isValid: false, parsedValue: 0, error: 'Value must be greater than 0' });
       expect(validateNumericInput(-5)).toEqual({ isValid: false, parsedValue: -5, error: 'Value must be greater than 0' });
       expect(validateNumericInput('-10.2')).toEqual({ isValid: false, parsedValue: -10.2, error: 'Value must be greater than 0' });
+    });
+  });
+
+  describe('sanitizeText', () => {
+    it('should strip out HTML tags', () => {
+      expect(sanitizeText('<script>alert("XSS")</script>Hello')).toBe('alert("XSS")Hello');
+      expect(sanitizeText('<p>This is <b>bold</b> text</p>')).toBe('This is bold text');
+    });
+
+    it('should trim surrounding whitespace', () => {
+      expect(sanitizeText('   clean me   ')).toBe('clean me');
+    });
+
+    it('should return empty string for null/undefined/empty input', () => {
+      // @ts-ignore
+      expect(sanitizeText(null)).toBe('');
+      // @ts-ignore
+      expect(sanitizeText(undefined)).toBe('');
+      expect(sanitizeText('')).toBe('');
     });
   });
 });

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import type { RouteOption } from '../services/mockServices';
 import { mockFirestore } from '../services/mockServices';
+import { sanitizeText } from '../utils/validation';
 
 interface GreenRouteTabProps {
   onLogAdded: () => void;
@@ -80,7 +81,12 @@ export const GreenRouteTab: React.FC<GreenRouteTabProps> = ({ onLogAdded }) => {
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!source || !destination || !distance || distance <= 0) return;
+    const sanitizedSource = sanitizeText(source);
+    const sanitizedDest = sanitizeText(destination);
+    if (!sanitizedSource || !sanitizedDest || !distance || distance <= 0) return;
+    
+    setSource(sanitizedSource);
+    setDestination(sanitizedDest);
     
     const calcRoutes = calculateRouteOptions(Number(distance));
     setRoutes(calcRoutes);
@@ -103,7 +109,9 @@ export const GreenRouteTab: React.FC<GreenRouteTabProps> = ({ onLogAdded }) => {
     if (!selectedRoute) return;
     setIsLogging(true);
     
-    let description = `Commuted via ${selectedRoute.mode.toUpperCase()} (${source} ➔ ${destination})`;
+    const sanitizedSource = sanitizeText(source);
+    const sanitizedDest = sanitizeText(destination);
+    let description = `Commuted via ${selectedRoute.mode.toUpperCase()} (${sanitizedSource} ➔ ${sanitizedDest})`;
     let distanceNum = Number(distance);
     
     mockFirestore.addLog('travel', description, distanceNum, 'km', selectedRoute.mode);

@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // User profile document rules
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Isolated logs subcollection access rules
+      match /logs/{logId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // Isolated challenges subcollection access rules
+      match /challenges/{challengeId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}

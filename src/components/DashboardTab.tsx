@@ -34,7 +34,7 @@ import {
   FOOD_FACTORS, 
   SHOPPING_FACTORS 
 } from '../services/mockServices';
-import { validateRequired, validateNumericInput } from '../utils/validation';
+import { validateRequired, validateNumericInput, sanitizeText } from '../utils/validation';
 
 ChartJS.register(
   CategoryScale,
@@ -136,7 +136,8 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
   // Handle logging form submit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const descValid = validateRequired(description);
+    const sanitizedDesc = sanitizeText(description);
+    const descValid = validateRequired(sanitizedDesc);
     const amountValResult = validateNumericInput(amount);
     if (!descValid || !amountValResult.isValid) return;
 
@@ -146,7 +147,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
     else if (category === 'food') unit = 'meals';
     else if (category === 'shopping') unit = 'items';
 
-    mockFirestore.addLog(category, description, Number(amount), unit, subCategory);
+    mockFirestore.addLog(category, sanitizedDesc, Number(amount), unit, subCategory);
     
     // Clear inputs and notify parent to re-fetch logs
     setAmount('');

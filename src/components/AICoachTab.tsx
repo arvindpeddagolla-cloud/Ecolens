@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, Bot, HelpCircle, User } from 'lucide-react';
 import { mockAuth, mockGeminiAI } from '../services/mockServices';
 import type { EmissionsLog } from '../services/mockServices';
+import { sanitizeText } from '../utils/validation';
 
 interface Message {
   id: string;
@@ -45,13 +46,14 @@ export const AICoachTab: React.FC<AICoachTabProps> = ({ logs }) => {
   }, [messages, isTyping]);
 
   const handleSendMessage = async (textToSend: string) => {
-    if (!textToSend.trim()) return;
+    const sanitizedText = sanitizeText(textToSend);
+    if (!sanitizedText) return;
 
     // 1. Add User Message
     const userMsg: Message = {
       id: `msg_user_${Date.now()}`,
       sender: 'user',
-      text: textToSend,
+      text: sanitizedText,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -61,7 +63,7 @@ export const AICoachTab: React.FC<AICoachTabProps> = ({ logs }) => {
 
     try {
       // 2. Call Gemini AI advisor
-      const coachReplyText = await mockGeminiAI.chatCoachResponse(textToSend, logs);
+      const coachReplyText = await mockGeminiAI.chatCoachResponse(sanitizedText, logs);
 
       const coachMsg: Message = {
         id: `msg_coach_${Date.now()}`,

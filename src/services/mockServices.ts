@@ -555,7 +555,7 @@ Return ONLY this JSON object. Do not wrap it in markdown code blocks like \`\`\`
       };
 
     } catch (err) {
-      console.error('OpenRouter vision API failed, falling back to mock:', err);
+      console.error('OpenRouter vision API failed (fallback active):', err instanceof Error ? err.message : String(err));
       // Fallback:
       await new Promise(resolve => setTimeout(resolve, 1500));
       const nameLower = fileName.toLowerCase();
@@ -693,7 +693,7 @@ Provide actionable tips, comparisons, and custom guides. All advice must align w
       throw new Error('Invalid OpenRouter response');
       
     } catch (err) {
-      console.error('OpenRouter chat API failed, falling back to local mock:', err);
+      console.error('OpenRouter chat API failed (fallback active):', err instanceof Error ? err.message : String(err));
       // Offline fallback:
       await new Promise(resolve => setTimeout(resolve, 1000));
       const lowerText = text.toLowerCase();

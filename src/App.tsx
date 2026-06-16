@@ -53,7 +53,7 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, onSnapshot, collection } from 'firebase/firestore';
 import { Sparkles, X, ChevronRight, Mail, Lock, User as UserIcon, LogIn, ChevronLeft, AlertTriangle } from 'lucide-react';
-import { getAuthErrorMessage, validateLoginInput, validateRegistrationInput } from './utils/validation';
+import { getAuthErrorMessage, validateLoginInput, validateRegistrationInput, sanitizeText } from './utils/validation';
 
 export const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -240,9 +240,12 @@ export const App: React.FC = () => {
     e.preventDefault();
     setAuthError(null);
 
+    const sanitizedEmail = sanitizeText(emailInput);
+    const sanitizedName = sanitizeText(nameInput);
+
     const validation = authMode === 'signup'
-      ? validateRegistrationInput(emailInput, passwordInput)
-      : validateLoginInput(emailInput, passwordInput);
+      ? validateRegistrationInput(sanitizedEmail, passwordInput)
+      : validateLoginInput(sanitizedEmail, passwordInput);
 
     if (!validation.isValid) {
       setAuthError(validation.error);
@@ -253,13 +256,13 @@ export const App: React.FC = () => {
       if (authMode === 'signup') {
         let firebaseUser;
         try {
-          const credentials = await createUserWithEmailAndPassword(auth, emailInput, passwordInput);
+          const credentials = await createUserWithEmailAndPassword(auth, sanitizedEmail, passwordInput);
           firebaseUser = credentials.user;
           
           const newUser: UserProfile = {
             uid: firebaseUser.uid,
-            email: firebaseUser.email || emailInput,
-            displayName: nameInput || 'Eco Champion',
+            email: firebaseUser.email || sanitizedEmail,
+            displayName: sanitizedName || 'Eco Champion',
             photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
             greenPoints: 0,
             xp: 0,
@@ -282,7 +285,7 @@ export const App: React.FC = () => {
         } catch (signupErr: any) {
           if (signupErr.code === 'auth/email-already-in-use') {
             console.log("Email already in use during signup, attempting automatic sign in...");
-            const credentials = await signInWithEmailAndPassword(auth, emailInput, passwordInput);
+            const credentials = await signInWithEmailAndPassword(auth, sanitizedEmail, passwordInput);
             firebaseUser = credentials.user;
             setShowAuthModal(false);
 
@@ -313,7 +316,7 @@ export const App: React.FC = () => {
           }
         }
       } else {
-        const credentials = await signInWithEmailAndPassword(auth, emailInput, passwordInput);
+        const credentials = await signInWithEmailAndPassword(auth, sanitizedEmail, passwordInput);
         const firebaseUser = credentials.user;
         setShowAuthModal(false);
 
