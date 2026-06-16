@@ -87,16 +87,18 @@ export const Hero: React.FC<HeroProps> = ({ onStartTracking, onWatchDemo }) => {
             className="flex flex-col sm:flex-row gap-4 items-center"
           >
             <button
+              type="button"
               onClick={onStartTracking}
-              className="glass-btn-primary group flex items-center justify-center gap-2 w-full sm:w-auto px-8"
+              className="glass-btn-primary group flex items-center justify-center gap-2 w-full sm:w-auto px-8 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             >
               <span>Go Green Today 🌱</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </button>
             
             <button
+              type="button"
               onClick={onWatchDemo}
-              className="glass-btn-secondary flex items-center justify-center gap-2 w-full sm:w-auto px-8"
+              className="glass-btn-secondary flex items-center justify-center gap-2 w-full sm:w-auto px-8 focus:outline-none focus:ring-2 focus:ring-slate-500/50"
             >
               <Play className="w-4 h-4 fill-slate-200 text-slate-200" />
               <span>Watch Demo</span>
@@ -105,7 +107,7 @@ export const Hero: React.FC<HeroProps> = ({ onStartTracking, onWatchDemo }) => {
         </div>
 
         {/* Right 3D Earth Column */}
-        <div className="lg:col-span-5 flex justify-center items-center relative py-10 lg:py-0">
+        <div aria-hidden="true" className="lg:col-span-5 flex justify-center items-center relative py-10 lg:py-0">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}

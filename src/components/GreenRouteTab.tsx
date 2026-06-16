@@ -162,16 +162,17 @@ export const GreenRouteTab: React.FC<GreenRouteTabProps> = ({ onLogAdded }) => {
         <form onSubmit={handleCalculate} className="grid grid-cols-1 md:grid-cols-12 gap-5 items-end">
           
           <div className="md:col-span-3 relative">
-            <label className="text-xs text-slate-400 font-bold block mb-2">SOURCE</label>
+            <label htmlFor="route-source-input" className="text-xs text-slate-400 font-bold block mb-2">SOURCE</label>
             <div className="relative">
               <MapPin className="absolute left-3.5 top-3.5 w-4.5 h-4.5 text-cyan-400" />
               <input
+                id="route-source-input"
                 type="text"
                 required
                 placeholder="Starting location"
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
-                className="glass-input !pl-11 w-full text-sm py-3"
+                className="glass-input !pl-11 w-full text-sm py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               />
             </div>
           </div>
@@ -183,23 +184,25 @@ export const GreenRouteTab: React.FC<GreenRouteTabProps> = ({ onLogAdded }) => {
           </div>
 
           <div className="md:col-span-3 relative">
-            <label className="text-xs text-slate-400 font-bold block mb-2">DESTINATION</label>
+            <label htmlFor="route-destination-input" className="text-xs text-slate-400 font-bold block mb-2">DESTINATION</label>
             <div className="relative">
               <MapPin className="absolute left-3.5 top-3.5 w-4.5 h-4.5 text-emerald-400" />
               <input
+                id="route-destination-input"
                 type="text"
                 required
                 placeholder="Destination"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
-                className="glass-input !pl-11 w-full text-sm py-3"
+                className="glass-input !pl-11 w-full text-sm py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               />
             </div>
           </div>
 
           <div className="md:col-span-2 relative">
-            <label className="text-xs text-slate-400 font-bold block mb-2">DISTANCE (KM)</label>
+            <label htmlFor="route-distance-input" className="text-xs text-slate-400 font-bold block mb-2">DISTANCE (KM)</label>
             <input
+              id="route-distance-input"
               type="number"
               required
               min="0.1"
@@ -207,14 +210,14 @@ export const GreenRouteTab: React.FC<GreenRouteTabProps> = ({ onLogAdded }) => {
               placeholder="e.g. 15"
               value={distance}
               onChange={(e) => setDistance(e.target.value === '' ? '' : Number(e.target.value))}
-              className="glass-input w-full text-sm py-3"
+              className="glass-input w-full text-sm py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
 
           <div className="md:col-span-3">
             <button
               type="submit"
-              className="glass-btn-primary w-full py-3 text-sm font-semibold flex items-center justify-center gap-2"
+              className="glass-btn-primary w-full py-3 text-sm font-semibold flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             >
               <Compass className="w-4 h-4" />
               <span>Optimize Route</span>
@@ -265,12 +268,15 @@ export const GreenRouteTab: React.FC<GreenRouteTabProps> = ({ onLogAdded }) => {
                   return (
                     <button
                       key={rt.mode}
+                      type="button"
                       onClick={() => setSelectedMode(rt.mode)}
+                      aria-pressed={isSelected}
+                      aria-label={`Select transit mode ${rt.mode}`}
                       className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
                         isSelected
                           ? `${modeColor} ring-1 ring-white/10 scale-[1.01] border-opacity-100`
                           : 'border-white/5 bg-slate-900/30 text-slate-400 hover:text-slate-200'
-                      }`}
+                      } focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl glass-card flex items-center justify-center border border-white/5 bg-slate-950/40">
@@ -355,7 +361,7 @@ export const GreenRouteTab: React.FC<GreenRouteTabProps> = ({ onLogAdded }) => {
                               <button
                                 onClick={handleLogGreenTrip}
                                 disabled={isLogging}
-                                className="glass-btn-primary py-2 px-4 text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-950/20"
+                                className="glass-btn-primary py-2 px-4 text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-950/20 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                               >
                                 <span>{isLogging ? 'Logging Commute...' : 'Log Green Trip & Save'}</span>
                               </button>

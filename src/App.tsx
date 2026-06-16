@@ -76,6 +76,7 @@ export const App: React.FC = () => {
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [nameInput, setNameInput] = useState('');
+  const [authError, setAuthError] = useState<string | null>(null);
 
   // Onboarding survey state
   const [onboardingStep, setOnboardingStep] = useState(1);
@@ -230,11 +231,13 @@ export const App: React.FC = () => {
 
   const handleOpenAuth = (mode: 'login' | 'signup') => {
     setAuthMode(mode);
+    setAuthError(null);
     setShowAuthModal(true);
   };
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAuthError(null);
     
     try {
       if (authMode === 'signup') {
@@ -341,9 +344,9 @@ export const App: React.FC = () => {
       } else if (err.code === 'auth/weak-password') {
         errMsg = "Password is too weak. Please use at least 6 characters.";
       }
-      alert(errMsg);
+      setAuthError(errMsg);
     }
-    
+
     setEmailInput('');
     setPasswordInput('');
     setNameInput('');
@@ -514,12 +517,14 @@ export const App: React.FC = () => {
                     ].map((mode) => (
                       <button
                         key={mode.id}
+                        type="button"
                         onClick={() => setOnboardTransport(mode.id as any)}
+                        aria-pressed={onboardTransport === mode.id}
                         className={`p-4 rounded-xl border text-left text-xs font-semibold transition-all ${
                           onboardTransport === mode.id 
                             ? 'border-emerald-500 bg-emerald-500/10 text-white' 
                             : 'border-white/5 bg-slate-900/30 text-slate-400 hover:text-slate-200'
-                        }`}
+                        } focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
                       >
                         <div className="flex justify-between items-center">
                           <span>{mode.label}</span>
@@ -543,18 +548,19 @@ export const App: React.FC = () => {
                   <p className="text-xs text-slate-400">Calculated using our carbon index factor of **0.82 kg CO₂/kWh**.</p>
                   
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center text-xs font-bold text-slate-300">
+                    <label htmlFor="onboard-kwh-input" className="flex justify-between items-center text-xs font-bold text-slate-300 cursor-pointer">
                       <span>MONTHLY USAGE</span>
                       <span className="text-emerald-400 text-sm">{onboardKwh} kWh</span>
-                    </div>
+                    </label>
                     <input
+                      id="onboard-kwh-input"
                       type="range"
                       min="20"
                       max="500"
                       step="10"
                       value={onboardKwh}
                       onChange={(e) => setOnboardKwh(Number(e.target.value))}
-                      className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-400"
+                      className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                     />
                     <div className="flex justify-between text-[9px] text-slate-500 font-bold">
                       <span>20 kWh (Eco apartments)</span>
@@ -583,12 +589,14 @@ export const App: React.FC = () => {
                     ].map((food) => (
                       <button
                         key={food.id}
+                        type="button"
                         onClick={() => setOnboardFood(food.id as any)}
+                        aria-pressed={onboardFood === food.id}
                         className={`p-4.5 rounded-xl border text-left text-xs font-semibold transition-all ${
                           onboardFood === food.id 
                             ? 'border-emerald-500 bg-emerald-500/10 text-white' 
                             : 'border-white/5 bg-slate-900/30 text-slate-400 hover:text-slate-200'
-                        }`}
+                        } focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
                       >
                         <span className="block text-white font-bold">{food.label}</span>
                         <span className="block text-[10px] text-slate-500 mt-1 font-medium">{food.desc}</span>
@@ -617,12 +625,14 @@ export const App: React.FC = () => {
                     ].map((shop) => (
                       <button
                         key={shop.id}
+                        type="button"
                         onClick={() => setOnboardShop(shop.id as any)}
+                        aria-pressed={onboardShop === shop.id}
                         className={`p-4 rounded-xl border text-center text-xs font-semibold transition-all flex flex-col items-center justify-center gap-2 ${
                           onboardShop === shop.id 
                             ? 'border-emerald-500 bg-emerald-500/10 text-white' 
                             : 'border-white/5 bg-slate-900/30 text-slate-400 hover:text-slate-200'
-                        }`}
+                        } focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
                       >
                         <span className="text-white font-bold">{shop.label}</span>
                         <span className="text-[9px] text-slate-500 leading-snug">{shop.desc}</span>
@@ -638,7 +648,7 @@ export const App: React.FC = () => {
               <button
                 disabled={onboardingStep === 1}
                 onClick={() => setOnboardingStep(prev => prev - 1)}
-                className="glass-btn-secondary px-4 py-2 text-xs flex items-center gap-1 disabled:opacity-30 disabled:scale-100"
+                className="glass-btn-secondary px-4 py-2 text-xs flex items-center gap-1 disabled:opacity-30 disabled:scale-100 focus:outline-none focus:ring-2 focus:ring-slate-500/50"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
                 <span>Back</span>
@@ -647,7 +657,7 @@ export const App: React.FC = () => {
               {onboardingStep < 4 ? (
                 <button
                   onClick={() => setOnboardingStep(prev => prev + 1)}
-                  className="glass-btn-primary px-4 py-2 text-xs flex items-center gap-1"
+                  className="glass-btn-primary px-4 py-2 text-xs flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                 >
                   <span>Next</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -655,7 +665,7 @@ export const App: React.FC = () => {
               ) : (
                 <button
                   onClick={handleOnboardingComplete}
-                  className="glass-btn-primary px-5 py-2 text-xs font-bold"
+                  className="glass-btn-primary px-5 py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                 >
                   Calculate My Score 🌱
                 </button>
@@ -774,7 +784,8 @@ export const App: React.FC = () => {
             >
               <button
                 onClick={() => setShowAuthModal(false)}
-                className="absolute top-4 right-4 text-slate-500 hover:text-white p-1.5 rounded-lg hover:bg-white/5"
+                aria-label="Close modal"
+                className="absolute top-4 right-4 text-slate-500 hover:text-white p-1.5 rounded-lg hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
                 <X className="w-4.5 h-4.5" />
               </button>
@@ -792,56 +803,72 @@ export const App: React.FC = () => {
 
               {/* Form */}
               <form onSubmit={handleAuthSubmit} className="space-y-4">
+                {authError && (
+                  <div id="auth-error-msg" role="alert" className="p-3 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 text-xs flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                    <span>{authError}</span>
+                  </div>
+                )}
+
                 {authMode === 'signup' && (
                   <div>
-                    <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Full Name</label>
+                    <label htmlFor="auth-name-input" className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Full Name</label>
                     <div className="relative">
                       <UserIcon className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-500" />
                       <input
+                        id="auth-name-input"
                         type="text"
                         required
                         placeholder="e.g. Alex Rivers"
                         value={nameInput}
                         onChange={(e) => setNameInput(e.target.value)}
-                        className="glass-input !pl-11 w-full text-xs py-3"
+                        aria-invalid={authError ? "true" : "false"}
+                        aria-describedby={authError ? "auth-error-msg" : undefined}
+                        className="glass-input !pl-11 w-full text-xs py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                       />
                     </div>
                   </div>
                 )}
 
                 <div>
-                  <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Email Address</label>
+                  <label htmlFor="auth-email-input" className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Email Address</label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-500" />
                     <input
+                      id="auth-email-input"
                       type="email"
                       required
                       placeholder="you@domain.com"
                       value={emailInput}
                       onChange={(e) => setEmailInput(e.target.value)}
-                      className="glass-input !pl-11 w-full text-xs py-3"
+                      aria-invalid={authError ? "true" : "false"}
+                      aria-describedby={authError ? "auth-error-msg" : undefined}
+                      className="glass-input !pl-11 w-full text-xs py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Password</label>
+                  <label htmlFor="auth-password-input" className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Password</label>
                   <div className="relative">
                     <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-500" />
                     <input
+                      id="auth-password-input"
                       type="password"
                       required
                       placeholder="••••••••"
                       value={passwordInput}
                       onChange={(e) => setPasswordInput(e.target.value)}
-                      className="glass-input !pl-11 w-full text-xs py-3"
+                      aria-invalid={authError ? "true" : "false"}
+                      aria-describedby={authError ? "auth-error-msg" : undefined}
+                      className="glass-input !pl-11 w-full text-xs py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                     />
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="glass-btn-primary w-full py-3.5 text-xs font-bold mt-2 flex items-center justify-center gap-1.5"
+                  className="glass-btn-primary w-full py-3.5 text-xs font-bold mt-2 flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                 >
                   <LogIn className="w-4 h-4" />
                   <span>{authMode === 'login' ? 'Sign In with Email' : 'Sign Up & Continue'}</span>
@@ -858,7 +885,7 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={handleGoogleSignInClick}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/5 bg-slate-900/30 hover:bg-slate-900/60 text-slate-200 text-xs font-semibold transition-all"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/5 bg-slate-900/30 hover:bg-slate-900/60 text-slate-200 text-xs font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
                 <svg viewBox="0 0 24 24" width="16" height="16" className="w-4 h-4" xmlns="http://www.w3.org/2000/svg">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -875,8 +902,11 @@ export const App: React.FC = () => {
                 </span>
                 <button
                   type="button"
-                  onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}
-                  className="text-emerald-400 font-bold hover:underline"
+                  onClick={() => {
+                    setAuthMode(authMode === 'login' ? 'signup' : 'login');
+                    setAuthError(null);
+                  }}
+                  className="text-emerald-400 font-bold hover:underline focus:outline-none focus:ring-2 focus:ring-emerald-500/30 rounded px-1"
                 >
                   {authMode === 'login' ? 'Sign Up' : 'Log In'}
                 </button>
@@ -905,12 +935,13 @@ export const App: React.FC = () => {
             >
               <button
                 onClick={handleCloseBadgeModal}
-                className="absolute top-4 right-4 text-slate-500 hover:text-white p-1 rounded-lg hover:bg-white/5"
+                aria-label="Close achievement modal"
+                className="absolute top-4 right-4 text-slate-500 hover:text-white p-1 rounded-lg hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
                 <X className="w-4.5 h-4.5" />
               </button>
 
-              <div className="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-4xl mx-auto mb-6 shadow-lg animate-bounce" style={{ animationDuration: '3s' }}>
+              <div aria-hidden="true" className="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-4xl mx-auto mb-6 shadow-lg animate-bounce" style={{ animationDuration: '3s' }}>
                 🏆
               </div>
 
@@ -929,7 +960,7 @@ export const App: React.FC = () => {
 
               <button
                 onClick={handleCloseBadgeModal}
-                className="glass-btn-primary w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-950/20"
+                className="glass-btn-primary w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-950/20 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
                 <span>Awesome, Thank You!</span>
                 <ChevronRight className="w-4 h-4" />

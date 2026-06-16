@@ -110,7 +110,7 @@ export const EarthSimulatorTab: React.FC<EarthSimulatorTabProps> = ({ logs }) =>
 
         <button
           onClick={handleResetToActual}
-          className="glass-btn-secondary py-2.5 px-4.5 text-xs font-bold flex items-center gap-1.5 border border-white/10 hover:bg-slate-800/60"
+          className="glass-btn-secondary py-2.5 px-4.5 text-xs font-bold flex items-center gap-1.5 border border-white/10 hover:bg-slate-800/60 focus:outline-none focus:ring-2 focus:ring-slate-500/50"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           <span>Sync to Actual Logs ({roundedActual} kg)</span>
@@ -323,7 +323,7 @@ export const EarthSimulatorTab: React.FC<EarthSimulatorTabProps> = ({ logs }) =>
             
             {/* Forecast period select */}
             <div>
-              <label className="text-[10px] text-slate-400 font-bold uppercase block mb-2">Forecast Period</label>
+              <span className="text-[10px] text-slate-400 font-bold uppercase block mb-2">Forecast Period</span>
               <div className="flex p-0.5 rounded-lg bg-slate-900 border border-white/5 text-xs select-none">
                 {(['1month', '1year', '5years'] as const).map((period) => (
                   <button
@@ -332,7 +332,7 @@ export const EarthSimulatorTab: React.FC<EarthSimulatorTabProps> = ({ logs }) =>
                     onClick={() => setForecastPeriod(period)}
                     className={`flex-1 px-2.5 py-1.5 rounded-md font-semibold transition-all text-center ${
                       forecastPeriod === period ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-slate-200'
-                    }`}
+                    } focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
                   >
                     {periodLabels[period]}
                   </button>
@@ -342,19 +342,20 @@ export const EarthSimulatorTab: React.FC<EarthSimulatorTabProps> = ({ logs }) =>
 
             {/* Slider Component to adjust baseline */}
             <div>
-              <div className="flex justify-between items-center text-xs font-bold text-slate-400 mb-2">
+              <label htmlFor="simulator-weekly-load-input" className="flex justify-between items-center text-xs font-bold text-slate-400 mb-2 cursor-pointer">
                 <span>WEEKLY BASELINE LOAD</span>
                 <span className="text-white">{baselineWeekly} kg CO₂</span>
-              </div>
+              </label>
               
               <input
+                id="simulator-weekly-load-input"
                 type="range"
                 min="10"
                 max="250"
                 step="5"
                 value={baselineWeekly}
                 onChange={(e) => setBaselineWeekly(Number(e.target.value))}
-                className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-eco-400 focus:outline-none"
+                className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-eco-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               />
               <div className="flex justify-between text-[9px] text-slate-500 font-bold mt-1.5">
                 <span>10 kg</span>
@@ -399,11 +400,13 @@ export const EarthSimulatorTab: React.FC<EarthSimulatorTabProps> = ({ logs }) =>
                     key={scenario.id}
                     type="button"
                     onClick={() => setSelectedScenario(scenario.id as any)}
+                    aria-pressed={isSelected}
+                    aria-label={`Select scenario ${scenario.name}`}
                     className={`w-full p-3.5 rounded-2xl border text-left transition-all ${
                       isSelected 
                         ? `${scenario.colorClass} ring-1 scale-[1.01] border-opacity-100` 
                         : 'border-white/5 bg-slate-900/30 text-slate-400 hover:border-white/10 hover:text-slate-300'
-                    }`}
+                    } focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
                   >
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-xs font-extrabold text-white">{scenario.name}</span>

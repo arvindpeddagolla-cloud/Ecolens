@@ -12,25 +12,25 @@ export const LeaderboardTab: React.FC = () => {
     switch (rank) {
       case 1:
         return (
-          <div className="w-6 h-6 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-extrabold text-xs shadow-md shadow-amber-950/20">
+          <div aria-label="Rank 1st, Gold Medal" className="w-6 h-6 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-extrabold text-xs shadow-md shadow-amber-950/20">
             🥇
           </div>
         );
       case 2:
         return (
-          <div className="w-6 h-6 rounded-full bg-slate-400/20 border border-slate-400/30 flex items-center justify-center text-slate-300 font-extrabold text-xs shadow-md shadow-slate-900/20">
+          <div aria-label="Rank 2nd, Silver Medal" className="w-6 h-6 rounded-full bg-slate-400/20 border border-slate-400/30 flex items-center justify-center text-slate-300 font-extrabold text-xs shadow-md shadow-slate-900/20">
             🥈
           </div>
         );
       case 3:
         return (
-          <div className="w-6 h-6 rounded-full bg-amber-800/20 border border-amber-800/30 flex items-center justify-center text-amber-600 font-extrabold text-xs shadow-md shadow-amber-950/20">
+          <div aria-label="Rank 3rd, Bronze Medal" className="w-6 h-6 rounded-full bg-amber-800/20 border border-amber-800/30 flex items-center justify-center text-amber-600 font-extrabold text-xs shadow-md shadow-amber-950/20">
             🥉
           </div>
         );
       default:
         return (
-          <span className="text-xs text-slate-500 font-bold w-6 text-center block">
+          <span aria-label={`Rank ${rank}`} className="text-xs text-slate-500 font-bold w-6 text-center block">
             {rank}
           </span>
         );
@@ -60,10 +60,10 @@ export const LeaderboardTab: React.FC = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-800/80 bg-slate-900/20 text-[10px] text-slate-400 font-bold uppercase tracking-wider select-none">
-                <th className="py-4 px-6 w-20">Rank</th>
-                <th className="py-4 px-6">Entity</th>
-                {boardType === 'global' && <th className="py-4 px-6">Rating</th>}
-                <th className="py-4 px-6 text-right w-36">Green Points</th>
+                <th scope="col" className="py-4 px-6 w-20">Rank</th>
+                <th scope="col" className="py-4 px-6">Entity</th>
+                {boardType === 'global' && <th scope="col" className="py-4 px-6">Rating</th>}
+                <th scope="col" className="py-4 px-6 text-right w-36">Green Points</th>
               </tr>
             </thead>
             <tbody>
@@ -96,7 +96,7 @@ export const LeaderboardTab: React.FC = () => {
                           {boardType === 'global' ? (
                             <img
                               src={row.avatar}
-                              alt={row.name}
+                              alt={`Avatar of ${row.name}`}
                               className="w-8 h-8 rounded-xl object-cover border border-white/10"
                             />
                           ) : (

@@ -155,9 +155,10 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
                     </div>
                   ) : (
                     <button
+                      type="button"
                       onClick={() => handleCompleteChallenge(ch.id)}
                       disabled={claimingId !== null}
-                      className="glass-btn-primary py-1 px-3 text-[10px] font-bold flex items-center gap-1 shadow-md shadow-emerald-950/10"
+                      className="glass-btn-primary py-1 px-3 text-[10px] font-bold flex items-center gap-1 shadow-md shadow-emerald-950/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                     >
                       <span>{claimingId === ch.id ? 'Claiming...' : 'Claim Completion'}</span>
                       <ChevronRight className="w-3 h-3" />
@@ -193,7 +194,7 @@ export const GamificationTab: React.FC<GamificationTabProps> = ({
                   }`}
                 >
                   <div className="relative w-14 h-14 rounded-xl glass-card flex items-center justify-center border border-white/5 mb-3 bg-slate-950/40 text-3xl select-none">
-                    <span>{badge.icon}</span>
+                    <span role="img" aria-label={`${badge.name} badge icon`}>{badge.icon}</span>
                     {isUnlocked && (
                       <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 flex items-center justify-center border border-slate-900 text-[8px] font-extrabold text-slate-900">
                         ✓

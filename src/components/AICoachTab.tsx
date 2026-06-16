@@ -111,12 +111,13 @@ export const AICoachTab: React.FC<AICoachTabProps> = ({ logs }) => {
       </div>
 
       {/* Message Feed Area */}
-      <div className="flex-grow overflow-y-auto p-6 space-y-4">
+      <div role="log" aria-live="polite" className="flex-grow overflow-y-auto p-6 space-y-4">
         {messages.map((msg) => {
           const isCoach = msg.sender === 'coach';
           return (
             <div
               key={msg.id}
+              aria-label={isCoach ? "Coach replied" : "You sent"}
               className={`flex items-start gap-3.5 ${!isCoach ? 'flex-row-reverse' : ''}`}
             >
               {/* Avatar indicator */}
@@ -169,8 +170,9 @@ export const AICoachTab: React.FC<AICoachTabProps> = ({ logs }) => {
             {smartPrompts.map((prompt) => (
               <button
                 key={prompt.text}
+                type="button"
                 onClick={() => handlePromptClick(prompt.text)}
-                className="text-[11px] font-bold text-slate-300 bg-slate-900/40 hover:bg-slate-900/80 border border-white/5 hover:border-slate-700/50 px-3.5 py-2 rounded-xl transition-all"
+                className="text-[11px] font-bold text-slate-300 bg-slate-900/40 hover:bg-slate-900/80 border border-white/5 hover:border-slate-700/50 px-3.5 py-2 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
                 {prompt.text}
               </button>
@@ -187,17 +189,20 @@ export const AICoachTab: React.FC<AICoachTabProps> = ({ logs }) => {
         }}
         className="p-5 border-t border-slate-800/80 bg-slate-900/20 flex gap-3"
       >
+        <label htmlFor="chat-input" className="sr-only">Ask your climate coach</label>
         <input
+          id="chat-input"
           type="text"
           placeholder="Ask anything about carbon footprints, recipes, energy..."
           value={inputVal}
           onChange={(e) => setInputVal(e.target.value)}
-          className="glass-input flex-grow text-xs py-3"
+          className="glass-input flex-grow text-xs py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
         />
         <button
           type="submit"
           disabled={!inputVal.trim()}
-          className="glass-btn-primary p-3 rounded-xl flex items-center justify-center disabled:opacity-50 disabled:scale-100"
+          aria-label="Send message"
+          className="glass-btn-primary p-3 rounded-xl flex items-center justify-center disabled:opacity-50 disabled:scale-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
         >
           <Send className="w-4 h-4 text-white" />
         </button>

@@ -426,7 +426,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
         {/* Quick Stats Grid */}
         <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
           
-          <div className="glass-card p-6.5 rounded-3xl border border-white/5 relative overflow-hidden flex flex-col justify-between">
+          <div role="status" aria-label="Total carbon logged stats" className="glass-card p-6.5 rounded-3xl border border-white/5 relative overflow-hidden flex flex-col justify-between">
             <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full blur-2xl" />
             <div>
               <span className="text-xs text-slate-400 font-bold block mb-1">TOTAL CARBON LOGGED</span>
@@ -439,7 +439,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
             </div>
           </div>
 
-          <div className="glass-card p-6.5 rounded-3xl border border-white/5 relative overflow-hidden flex flex-col justify-between">
+          <div role="status" aria-label="Tree offset equivalent stats" className="glass-card p-6.5 rounded-3xl border border-white/5 relative overflow-hidden flex flex-col justify-between">
             <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl" />
             <div>
               <span className="text-xs text-slate-400 font-bold block mb-1">OFFSET EQUIVALENT</span>
@@ -451,7 +451,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
             </div>
           </div>
 
-          <div className="glass-card p-6.5 rounded-3xl border border-white/5 relative overflow-hidden flex flex-col justify-between">
+          <div role="status" aria-label="Carbon saved stats" className="glass-card p-6.5 rounded-3xl border border-white/5 relative overflow-hidden flex flex-col justify-between">
             <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl" />
             <div>
               <span className="text-xs text-slate-400 font-bold block mb-1">CARBON SAVED</span>
@@ -463,7 +463,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
             </div>
           </div>
 
-          <div className="glass-card p-6 rounded-3xl border border-white/5 relative overflow-hidden flex flex-col justify-between">
+          <div role="status" aria-label="Carbon footprint intervals" className="glass-card p-6 rounded-3xl border border-white/5 relative overflow-hidden flex flex-col justify-between">
             <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl" />
             <div>
               <span className="text-xs text-slate-400 font-bold block mb-2">FOOTPRINT BY INTERVAL</span>
@@ -505,7 +505,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
               
               {/* Category picker icons */}
               <div>
-                <label className="text-xs text-slate-400 font-bold block mb-2.5">CATEGORY</label>
+                <span className="text-xs text-slate-400 font-bold block mb-2.5">CATEGORY</span>
                 <div className="grid grid-cols-4 gap-2">
                   {[
                     { id: 'travel', icon: Car, label: 'Travel', color: 'text-cyan-400 bg-cyan-950/20 border-cyan-500/20' },
@@ -520,11 +520,13 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
                         key={cat.id}
                         type="button"
                         onClick={() => handleCategoryChange(cat.id as any)}
+                        aria-pressed={isSelected}
+                        aria-label={`Select category ${cat.label}`}
                         className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${
                           isSelected 
                             ? `${cat.color} ring-1 ring-offset-0 ring-white/10 scale-105 border-opacity-100` 
                             : 'border-white/5 bg-slate-900/30 text-slate-500 hover:text-slate-300'
-                        }`}
+                        } focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
                       >
                         <Icon className="w-5 h-5 mb-1.5" />
                         <span className="text-[10px] font-bold">{cat.label}</span>
@@ -536,15 +538,16 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
 
               {/* Subcategory selection dropdown */}
               <div>
-                <label className="text-xs text-slate-400 font-bold block mb-2">TYPE</label>
+                <label htmlFor="dashboard-type-select" className="text-xs text-slate-400 font-bold block mb-2">TYPE</label>
                 <select
+                  id="dashboard-type-select"
                   value={subCategory}
                   onChange={(e) => {
                     const val = e.target.value;
                     setSubCategory(val);
                     // Update default description dynamically
                     if (category === 'travel') {
-                      setDescription(`Commute by ${val.charAt(0).toUpperCase() + val.slice(1)}`);
+                      setDescription(`Commute by ${val.charAt(0).toUpperCase() + val.slice(val.indexOf(val))}`);
                     } else if (category === 'food') {
                       setDescription(`${val.charAt(0).toUpperCase() + val.slice(1)} Meal`);
                     } else if (category === 'shopping') {
@@ -558,7 +561,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
                       setDescription(labelMap[val] || 'Shopping Item');
                     }
                   }}
-                  className="glass-input w-full text-sm py-2.5 px-4 bg-slate-950/40 border border-white/10 rounded-xl text-white outline-none focus:border-eco-500/50"
+                  className="glass-input w-full text-sm py-2.5 px-4 bg-slate-950/40 border border-white/10 rounded-xl text-white outline-none focus:border-eco-500/50 focus:ring-2 focus:ring-emerald-500/30"
                 >
                   {category === 'travel' && (
                     <>
@@ -598,21 +601,23 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
 
               {/* Description */}
               <div>
-                <label className="text-xs text-slate-400 font-bold block mb-2">DESCRIPTION</label>
+                <label htmlFor="dashboard-description-input" className="text-xs text-slate-400 font-bold block mb-2">DESCRIPTION</label>
                 <input
+                  id="dashboard-description-input"
                   type="text"
                   required
                   placeholder="e.g. Driving gas sedan, Beef tacos, AC run"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="glass-input w-full text-sm"
+                  className="glass-input w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                 />
               </div>
 
               {/* Amount */}
               <div>
-                <label className="text-xs text-slate-400 font-bold block mb-2">{getUnitLabel().toUpperCase()}</label>
+                <label htmlFor="dashboard-amount-input" className="text-xs text-slate-400 font-bold block mb-2">{getUnitLabel().toUpperCase()}</label>
                 <input
+                  id="dashboard-amount-input"
                   type="number"
                   required
                   min="0.1"
@@ -620,23 +625,26 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
                   placeholder="0.0"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="glass-input w-full text-sm"
+                  className="glass-input w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                 />
               </div>
 
-              {liveCalc && (
-                <div className="bg-emerald-500/10 border border-emerald-500/20 p-3.5 rounded-xl text-xs space-y-1 animate-fadeIn">
-                  <span className="text-[10px] text-emerald-400 font-extrabold uppercase block tracking-wider">Formula Preview</span>
-                  <div className="flex flex-col gap-0.5">
-                    <span className="font-mono text-slate-300 text-[11px]">{liveCalc.formula}</span>
-                    <span className="text-emerald-400 font-extrabold text-xs mt-0.5">= {liveCalc.result}</span>
+              {/* Live Formula Preview Zone */}
+              <div aria-live="polite" className="min-h-[60px]">
+                {liveCalc ? (
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 p-3.5 rounded-xl text-xs space-y-1 animate-fadeIn">
+                    <span className="text-[10px] text-emerald-400 font-extrabold uppercase block tracking-wider">Formula Preview</span>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-mono text-slate-300 text-[11px]">{liveCalc.formula}</span>
+                      <span className="text-emerald-400 font-extrabold text-xs mt-0.5">= {liveCalc.result}</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                ) : null}
+              </div>
 
               <button
                 type="submit"
-                className="glass-btn-primary w-full py-3 mt-4 text-sm font-semibold flex items-center justify-center gap-2"
+                className="glass-btn-primary w-full py-3 mt-4 text-sm font-semibold flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
                 <Plus className="w-4 h-4" />
                 <span>Log Emissions</span>
@@ -697,8 +705,9 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
                     if (log.category === 'shopping') { CatIcon = ShoppingBag; catColor = 'text-purple-400'; }
                     
                     return (
-                      <div 
+                      <article 
                         key={log.id} 
+                        aria-label={`Log: ${log.description}`}
                         className="flex items-center justify-between p-3.5 rounded-xl border border-white/5 bg-slate-900/30 hover:bg-slate-900/50 transition-colors"
                       >
                         <div className="flex items-center gap-3">
@@ -724,13 +733,14 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
                           </div>
                           <button
                             onClick={() => handleDeleteLog(log.id)}
-                            className="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-500/10 transition-colors"
+                            aria-label={`Delete log ${log.description}`}
+                            className="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500/50"
                             title="Delete log"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
-                      </div>
+                      </article>
                     );
                   })
                 )}

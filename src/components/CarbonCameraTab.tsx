@@ -160,16 +160,25 @@ export const CarbonCameraTab: React.FC<CarbonCameraTabProps> = ({ onLogAdded }) 
                   className="flex-grow flex flex-col items-center justify-center p-6"
                 >
                   <div
+                    role="button"
+                    tabIndex={0}
                     onDragEnter={handleDrag}
                     onDragOver={handleDrag}
                     onDragLeave={handleDrag}
                     onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        fileInputRef.current?.click();
+                      }
+                    }}
+                    aria-label="Upload image"
                     className={`w-full flex-grow border-2 border-dashed rounded-2xl flex flex-col items-center justify-center py-12 px-6 text-center cursor-pointer transition-all ${
                       dragActive
                         ? 'border-emerald-400 bg-emerald-500/5'
                         : 'border-white/10 hover:border-white/20 hover:bg-white/5'
-                    }`}
+                    } focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
                   >
                     <input
                       ref={fileInputRef}
@@ -179,7 +188,7 @@ export const CarbonCameraTab: React.FC<CarbonCameraTabProps> = ({ onLogAdded }) 
                       className="hidden"
                     />
                     
-                    <div className="w-14 h-14 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20 mb-4 animate-bounce" style={{ animationDuration: '3s' }}>
+                    <div aria-hidden="true" className="w-14 h-14 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20 mb-4 animate-bounce" style={{ animationDuration: '3s' }}>
                       <Upload className="w-6 h-6" />
                     </div>
                     
@@ -199,10 +208,11 @@ export const CarbonCameraTab: React.FC<CarbonCameraTabProps> = ({ onLogAdded }) 
                       {demoTemplates.map((demo) => (
                         <button
                           key={demo.name}
+                          type="button"
                           onClick={() => handleSelectDemo(demo.name, demo.image)}
-                          className="flex items-center gap-2 p-2 rounded-xl border border-white/5 bg-slate-900/30 hover:bg-slate-900/50 hover:border-white/10 text-left transition-colors text-xs font-semibold"
+                          className="flex items-center gap-2 p-2 rounded-xl border border-white/5 bg-slate-900/30 hover:bg-slate-900/50 hover:border-white/10 text-left transition-colors text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                         >
-                          <img src={demo.image} className="w-8 h-8 rounded-lg object-cover" />
+                          <img src={demo.image} alt={`Template preview for ${demo.label}`} className="w-8 h-8 rounded-lg object-cover" />
                           <span className="text-slate-300 truncate">{demo.label}</span>
                         </button>
                       ))}
@@ -223,7 +233,7 @@ export const CarbonCameraTab: React.FC<CarbonCameraTabProps> = ({ onLogAdded }) 
                   <div className="relative w-full h-80 rounded-2xl overflow-hidden border border-white/10 bg-slate-950/40">
                     <img 
                       src={imagePreview} 
-                      alt="Scanned item" 
+                      alt="Scanned item preview" 
                       className="w-full h-full object-cover select-none"
                     />
 
@@ -243,7 +253,7 @@ export const CarbonCameraTab: React.FC<CarbonCameraTabProps> = ({ onLogAdded }) 
 
                   {/* Scanning Status overlay */}
                   {isScanning && (
-                    <div className="w-full text-center mt-6">
+                    <div role="status" aria-live="polite" className="w-full text-center mt-6">
                       <div className="flex items-center justify-center gap-2 text-xs font-bold text-emerald-400 uppercase tracking-widest">
                         <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />
                         <span>AI Scanning in progress...</span>
@@ -258,7 +268,7 @@ export const CarbonCameraTab: React.FC<CarbonCameraTabProps> = ({ onLogAdded }) 
                   {analysisResult && (
                     <button
                       onClick={handleReset}
-                      className="mt-6 glass-btn-secondary py-2 px-5 text-xs font-bold flex items-center gap-1.5"
+                      className="mt-6 glass-btn-secondary py-2 px-5 text-xs font-bold flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-slate-500/50"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
                       <span>Scan Another Photo</span>
@@ -382,7 +392,8 @@ export const CarbonCameraTab: React.FC<CarbonCameraTabProps> = ({ onLogAdded }) 
                           <button
                             onClick={() => handleLogItem(alt.name, alt.subCategory)}
                             disabled={isLogging}
-                            className="glass-btn-primary py-1.5 px-3.5 text-[10px] font-bold flex items-center gap-1 shadow-md shadow-emerald-950/10"
+                            aria-label={`Adopt and log alternative ${alt.name}`}
+                            className="glass-btn-primary py-1.5 px-3.5 text-[10px] font-bold flex items-center gap-1 shadow-md shadow-emerald-950/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                           >
                             <span>Adopt & Log</span>
                             <ChevronRight className="w-3 h-3" />
@@ -426,7 +437,7 @@ export const CarbonCameraTab: React.FC<CarbonCameraTabProps> = ({ onLogAdded }) 
                         <button
                           onClick={() => handleLogItem()}
                           disabled={isLogging}
-                          className="glass-btn-secondary py-2 px-4.5 text-[11px] font-bold border border-white/10 hover:bg-slate-800/60"
+                          className="glass-btn-secondary py-2 px-4.5 text-[11px] font-bold border border-white/10 hover:bg-slate-800/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                         >
                           {isLogging ? 'Logging...' : 'Log Scanned Impact'}
                         </button>

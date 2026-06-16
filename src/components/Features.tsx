@@ -93,14 +93,16 @@ export const Features: React.FC<FeaturesProps> = ({ onSelectFeature }) => {
         {/* Feature Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {list.map((item, idx) => (
-            <motion.div
+            <motion.button
               key={item.id}
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: idx * 0.15 }}
               onClick={() => onSelectFeature(item.id)}
-              className={`glass-card p-8 rounded-2xl border ${item.color} relative overflow-hidden flex flex-col justify-between cursor-pointer ${item.hoverClass} shadow-xl`}
+              type="button"
+              aria-label={`Launch ${item.title}`}
+              className={`glass-card p-8 rounded-2xl border ${item.color} relative overflow-hidden flex flex-col justify-between cursor-pointer ${item.hoverClass} shadow-xl text-left focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
             >
               {/* Radial glow background in card */}
               <div className={`absolute -top-20 -right-20 w-44 h-44 rounded-full ${item.glow} opacity-40 blur-3xl`} />
@@ -134,7 +136,7 @@ export const Features: React.FC<FeaturesProps> = ({ onSelectFeature }) => {
                 <span>Launch Tool</span>
                 <span className="transform translate-x-0 group-hover:translate-x-1.5 transition-transform">→</span>
               </div>
-            </motion.div>
+            </motion.button>
           ))}
         </div>
       </div>

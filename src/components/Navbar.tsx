@@ -21,6 +21,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLogin
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [avatarDropdownOpen, setAvatarDropdownOpen] = useState(false);
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -35,6 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);
     setMobileMenuOpen(false);
+    setAvatarDropdownOpen(false);
   };
 
   // Calculate XP Percentage for level bar
@@ -44,13 +46,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   const xpPercent = Math.min((currentLevelXp / xpNeededForNextLevel) * 100, 100);
 
   return (
-    <nav className="sticky top-0 z-50 w-full glass-card border-b border-white/5 backdrop-blur-glass bg-dark-950/70 py-4 px-4 md:px-8">
+    <header className="sticky top-0 z-50 w-full glass-card border-b border-white/5 backdrop-blur-glass bg-dark-950/70 py-4 px-4 md:px-8">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
         {/* Logo */}
-        <div 
+        <button 
+          type="button"
           onClick={() => handleTabClick(isLoggedIn ? 'dashboard' : 'landing')}
-          className="flex items-center gap-2.5 cursor-pointer group select-none"
+          className="flex items-center gap-2.5 cursor-pointer group select-none focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded-xl p-1 text-left"
+          aria-label="EcoLens AI Home"
         >
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-400 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
             <Leaf className="w-5 h-5 text-dark-950 stroke-[2.5]" />
@@ -58,11 +62,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-300 bg-clip-text text-transparent">
             EcoLens<span className="text-white font-normal">AI</span>
           </span>
-        </div>
+        </button>
 
         {/* Desktop Tabs */}
         {isLoggedIn && (
-          <div className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1" aria-label="Desktop Navigation">
             {navItems.map((item) => {
               const isActive = activeTab === item.id;
               const Icon = item.icon;
@@ -74,7 +78,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     isActive 
                       ? 'text-white font-bold' 
                       : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
-                  }`}
+                  } focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
                 >
                   {isActive && (
                     <motion.div
@@ -88,7 +92,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               );
             })}
-          </div>
+          </nav>
         )}
 
         {/* User Pill / Login Button */}
@@ -122,32 +126,48 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <div className="h-6 w-[1px] bg-slate-800" />
 
                 {/* Avatar */}
-                <div className="relative group">
-                  <img
-                    src={user.photoURL}
-                    alt={user.displayName}
-                    className="w-8 h-8 rounded-xl object-cover border border-white/20 group-hover:border-eco-400 transition-colors cursor-pointer"
-                  />
-                  <div className="absolute right-0 top-10 w-48 glass-card border-white/10 rounded-xl p-2 hidden group-hover:block hover:block bg-dark-900/90 shadow-xl z-50">
-                    <div className="px-2.5 py-1.5 border-b border-slate-800/80 mb-1.5 text-left">
-                      <div className="font-bold text-sm text-white truncate">{user.displayName}</div>
-                      <div className="text-xs text-slate-400 truncate">{user.email}</div>
-                    </div>
-                    <button
-                      onClick={onLogout}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-xs text-rose-400 hover:bg-rose-500/10 font-medium transition-colors"
-                    >
-                      <LogOut className="w-3.5 h-3.5" />
-                      <span>Log Out</span>
-                    </button>
-                  </div>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setAvatarDropdownOpen(!avatarDropdownOpen)}
+                    aria-haspopup="true"
+                    aria-expanded={avatarDropdownOpen}
+                    aria-label="User profile menu"
+                    className="w-8 h-8 rounded-xl object-cover border border-white/20 hover:border-eco-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-colors overflow-hidden"
+                  >
+                    <img
+                      src={user.photoURL}
+                      alt={user.displayName}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                  <AnimatePresence>
+                    {avatarDropdownOpen && (
+                      <div className="absolute right-0 top-10 w-48 glass-card border-white/10 rounded-xl p-2 bg-dark-900/90 shadow-xl z-50">
+                        <div className="px-2.5 py-1.5 border-b border-slate-800/80 mb-1.5 text-left">
+                          <div className="font-bold text-sm text-white truncate">{user.displayName}</div>
+                          <div className="text-xs text-slate-400 truncate">{user.email}</div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setAvatarDropdownOpen(false);
+                            onLogout();
+                          }}
+                          className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-xs text-rose-400 hover:bg-rose-500/10 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500/30"
+                        >
+                          <LogOut className="w-3.5 h-3.5" />
+                          <span>Log Out</span>
+                        </button>
+                      </div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
 
               {/* Standalone Log Out Button (Desktop) */}
               <button
                 onClick={onLogout}
-                className="hidden md:flex items-center gap-1.5 px-4.5 py-2 rounded-xl border border-rose-500/20 bg-rose-500/5 hover:bg-rose-500/10 text-rose-400 font-bold text-xs transition-all select-none hover:scale-105 active:scale-95"
+                className="hidden md:flex items-center gap-1.5 px-4.5 py-2 rounded-xl border border-rose-500/20 bg-rose-500/5 hover:bg-rose-500/10 text-rose-400 font-bold text-xs transition-all select-none hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-rose-500/50"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Log Out</span>
@@ -156,7 +176,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               {/* Mobile menu toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden w-10 h-10 rounded-xl glass-card flex items-center justify-center text-slate-300 hover:text-white border border-white/10"
+                aria-label="Toggle navigation menu"
+                aria-expanded={mobileMenuOpen}
+                className="lg:hidden w-10 h-10 rounded-xl glass-card flex items-center justify-center text-slate-300 hover:text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
@@ -164,7 +186,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           ) : (
             <button
               onClick={onLogin}
-              className="glass-btn-primary px-5 py-2.5 text-sm"
+              className="glass-btn-primary px-5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             >
               Start Tracking
             </button>
@@ -181,7 +203,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             exit={{ opacity: 0, height: 0 }}
             className="lg:hidden border-t border-slate-800/80 mt-4 overflow-hidden"
           >
-            <div className="py-4 space-y-1.5">
+            <nav className="py-4 space-y-1.5" aria-label="Mobile Navigation">
               {navItems.map((item) => {
                 const isActive = activeTab === item.id;
                 const Icon = item.icon;
@@ -193,7 +215,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       isActive 
                         ? 'bg-gradient-to-r from-emerald-500/10 to-transparent text-white border-l-2 border-eco-500' 
                         : 'text-slate-400 hover:bg-white/5 hover:text-white'
-                    }`}
+                    } focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
                   >
                     <Icon className={`w-4 h-4 ${isActive ? 'text-eco-400' : 'text-slate-400'}`} />
                     <span>{item.label}</span>
@@ -206,7 +228,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               {/* Mobile User Profile details */}
               <div className="px-4 py-2 flex flex-col gap-2">
                 <div className="flex items-center gap-3">
-                  <img src={user.photoURL} className="w-9 h-9 rounded-xl object-cover" />
+                  <img src={user.photoURL} alt={user.displayName} className="w-9 h-9 rounded-xl object-cover" />
                   <div>
                     <div className="text-sm font-bold text-white">{user.displayName}</div>
                     <div className="text-xs text-slate-400">{user.email}</div>
@@ -226,16 +248,16 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                 <button
                   onClick={onLogout}
-                  className="w-full flex items-center justify-center gap-2 mt-4 px-4 py-3 border border-rose-500/20 bg-rose-500/5 hover:bg-rose-500/10 text-rose-400 font-semibold text-sm rounded-xl transition-all"
+                  className="w-full flex items-center justify-center gap-2 mt-4 px-4 py-3 border border-rose-500/20 bg-rose-500/5 hover:bg-rose-500/10 text-rose-400 font-semibold text-sm rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-rose-500/50"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Log Out</span>
                 </button>
               </div>
-            </div>
+            </nav>
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </header>
   );
 };
