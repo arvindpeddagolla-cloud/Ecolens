@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.gemini/
+*.log
+push_project.js
+push_project.cjs
+push_to_github.bat
+auto_push.js
+auto_push.cjs
+test_push.cjs
+test_push_url.cjs
