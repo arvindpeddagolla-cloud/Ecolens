@@ -34,6 +34,7 @@ import {
   FOOD_FACTORS, 
   SHOPPING_FACTORS 
 } from '../services/mockServices';
+import { validateRequired, validateNumericInput } from '../utils/validation';
 
 ChartJS.register(
   CategoryScale,
@@ -132,11 +133,12 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ logs, onLogAdded, on
       setDescription('Plastic Product Purchase');
     }
   };
-
   // Handle logging form submit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!description || !amount || amount <= 0) return;
+    const descValid = validateRequired(description);
+    const amountValResult = validateNumericInput(amount);
+    if (!descValid || !amountValResult.isValid) return;
 
     let unit = 'units';
     if (category === 'travel') unit = 'km';

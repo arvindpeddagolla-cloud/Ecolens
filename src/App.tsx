@@ -53,6 +53,7 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, onSnapshot, collection } from 'firebase/firestore';
 import { Sparkles, X, ChevronRight, Mail, Lock, User as UserIcon, LogIn, ChevronLeft, AlertTriangle } from 'lucide-react';
+import { getAuthErrorMessage, validateLoginInput, validateRegistrationInput } from './utils/validation';
 
 export const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -238,6 +239,15 @@ export const App: React.FC = () => {
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
+
+    const validation = authMode === 'signup'
+      ? validateRegistrationInput(emailInput, passwordInput)
+      : validateLoginInput(emailInput, passwordInput);
+
+    if (!validation.isValid) {
+      setAuthError(validation.error);
+      return;
+    }
     
     try {
       if (authMode === 'signup') {
@@ -332,18 +342,7 @@ export const App: React.FC = () => {
       }
     } catch (err: any) {
       console.error("Auth error details:", err);
-      let errMsg = err.message || "Authentication failed.";
-      
-      // Map standard Firebase Auth error codes to helpful troubleshooting advice
-      if (err.code === 'auth/operation-not-allowed') {
-        errMsg = "Email/Password sign-in method is currently disabled in your Firebase console. Please go to Firebase Console > Authentication > Sign-in Method, and enable 'Email/Password'.";
-      } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-        errMsg = "Invalid email or password. Verify your credentials, or click 'Sign Up' to register a new account.";
-      } else if (err.code === 'auth/email-already-in-use') {
-        errMsg = "This email address is already registered. Please sign in or use a different email.";
-      } else if (err.code === 'auth/weak-password') {
-        errMsg = "Password is too weak. Please use at least 6 characters.";
-      }
+      const errMsg = getAuthErrorMessage(err.code, err.message || "Authentication failed.");
       setAuthError(errMsg);
     }
 

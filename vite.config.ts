@@ -1,7 +1,25 @@
-import { defineConfig } from 'vite'
+/// <reference types="vitest" />
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  test: {
+    globals: true,
+    environment: 'node',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'dist/',
+        'eslint.config.js',
+        'postcss.config.js',
+        'tailwind.config.js',
+        'vite.config.ts',
+        'src/services/firebase.ts',
+      ],
+    },
+  },
 })
