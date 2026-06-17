@@ -178,21 +178,24 @@ export const calculateCarbon = (category: string, subCategory: string, amount: n
   let co2 = 0;
   
   switch (category) {
-    case 'travel':
+    case 'travel': {
       const travelFactor = TRAVEL_FACTORS[subCategory as keyof typeof TRAVEL_FACTORS] || 0;
       co2 = amount * travelFactor;
       break;
+    }
     case 'energy':
       co2 = amount * ELECTRICITY_FACTOR;
       break;
-    case 'food':
+    case 'food': {
       const foodFactor = FOOD_FACTORS[subCategory as keyof typeof FOOD_FACTORS] || 2;
       co2 = amount * foodFactor;
       break;
-    case 'shopping':
+    }
+    case 'shopping': {
       const shopFactor = SHOPPING_FACTORS[subCategory as keyof typeof SHOPPING_FACTORS] || 4;
       co2 = amount * shopFactor;
       break;
+    }
   }
   
   return Math.round(co2 * 10) / 10;
@@ -222,7 +225,7 @@ export const mockAuth = {
   },
   checkAndUnlockBadges: (user: UserProfile): void => {
     const currentBadges = [...user.badges];
-    let newlyUnlocked: string[] = [];
+    const newlyUnlocked: string[] = [];
     
     ALL_BADGES.forEach(badge => {
       if (!currentBadges.includes(badge.id) && user.xp >= badge.xpRequired) {
@@ -435,13 +438,27 @@ export const mockFirestore = {
   }
 };
 
+interface GeminiContentItem {
+  type: string;
+  text?: string;
+  image_url?: {
+    url: string;
+  };
+}
+
+interface ParsedAlternative {
+  name: string;
+  subCategory: string;
+  description: string;
+}
+
 export const mockGeminiAI = {
   // Vision integration: detects category and applies formulas
   analyzeImage: async (fileName: string, imgDataUrl?: string): Promise<CameraAnalysisResult> => {
     const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || '';
     
     try {
-      let contentArray: any[] = [
+      const contentArray: GeminiContentItem[] = [
         {
           type: "text",
           text: `You are the EcoLens AI computer vision analyzer. Analyze this image of an item, product, meal, or document.
@@ -482,7 +499,10 @@ Return ONLY this JSON object. Do not wrap it in markdown code blocks like \`\`\`
           }
         });
       } else {
-        contentArray[0].text += `\n(Since no image payload was attached, perform analysis based on this file name description: "${fileName}")`;
+        const firstItem = contentArray[0];
+        if (firstItem && firstItem.text) {
+          firstItem.text += `\n(Since no image payload was attached, perform analysis based on this file name description: "${fileName}")`;
+        }
       }
 
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -531,7 +551,7 @@ Return ONLY this JSON object. Do not wrap it in markdown code blocks like \`\`\`
       const detectedSub = parsed.detectedSubCategory as keyof typeof factorMap;
       const baseFootprint = factorMap[detectedSub] || 5;
 
-      const alternatives = parsed.alternatives.map((alt: any) => {
+      const alternatives = parsed.alternatives.map((alt: ParsedAlternative) => {
         const altSub = alt.subCategory as keyof typeof factorMap;
         const altFootprint = factorMap[altSub] || 2;
         const savingsPercent = Math.max(0, Math.round(((baseFootprint - altFootprint) / baseFootprint) * 100));

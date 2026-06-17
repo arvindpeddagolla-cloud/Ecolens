@@ -43,7 +43,7 @@ describe('Form Validation Utility Tests', () => {
 
     it('should reject empty or null inputs', () => {
       expect(validateNumericInput('')).toEqual({ isValid: false, parsedValue: 0, error: 'Value is required' });
-      // @ts-ignore
+      // @ts-expect-error - testing invalid null parameter
       expect(validateNumericInput(null)).toEqual({ isValid: false, parsedValue: 0, error: 'Value is required' });
     });
 
@@ -70,9 +70,9 @@ describe('Form Validation Utility Tests', () => {
     });
 
     it('should return empty string for null/undefined/empty input', () => {
-      // @ts-ignore
+      // @ts-expect-error - testing invalid null parameter
       expect(sanitizeText(null)).toBe('');
-      // @ts-ignore
+      // @ts-expect-error - testing invalid undefined parameter
       expect(sanitizeText(undefined)).toBe('');
       expect(sanitizeText('')).toBe('');
     });

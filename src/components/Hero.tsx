@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Compass, Leaf, ArrowRight, Play } from 'lucide-react';
 
@@ -8,19 +8,15 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({ onStartTracking, onWatchDemo }) => {
-  const [leaves, setLeaves] = useState<{ id: number; left: number; delay: number; scale: number; speed: number }[]>([]);
-
-  useEffect(() => {
-    // Generate floating leaves
-    const generatedLeaves = Array.from({ length: 15 }).map((_, i) => ({
+  const [leaves] = useState(() =>
+    Array.from({ length: 15 }).map((_, i) => ({
       id: i,
       left: Math.random() * 90 + 5, // random horizontal position
       delay: Math.random() * 10,
       scale: Math.random() * 0.6 + 0.5,
       speed: Math.random() * 6 + 10, // animation speed in seconds
-    }));
-    setLeaves(generatedLeaves);
-  }, []);
+    }))
+  );
 
   return (
     <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden px-4 py-12 md:py-24">
