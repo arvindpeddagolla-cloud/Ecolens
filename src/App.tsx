@@ -47,6 +47,10 @@ export const App: React.FC = () => {
   const [notifications, setNotifications] = useState<NotificationAlert[]>([]);
   const [unlockedBadgeName, setUnlockedBadgeName] = useState<string | null>(null);
 
+  // Firestore unsubscribers to prevent memory leaks and out-of-sync triggers
+  const unsubscribeUserRef = useRef<(() => void) | null>(null);
+  const unsubscribeLogsRef = useRef<(() => void) | null>(null);
+
   // Authentication UI state
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authInitialMode, setAuthInitialMode] = useState<'login' | 'signup'>('login');
@@ -61,6 +65,16 @@ export const App: React.FC = () => {
   // Sync state with live Firebase Auth and Firestore on load
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
+      // Clean up previous listeners if any exist
+      if (unsubscribeUserRef.current) {
+        unsubscribeUserRef.current();
+        unsubscribeUserRef.current = null;
+      }
+      if (unsubscribeLogsRef.current) {
+        unsubscribeLogsRef.current();
+        unsubscribeLogsRef.current = null;
+      }
+
       if (firebaseUser) {
         setIsLoggedIn(true);
 
@@ -70,7 +84,7 @@ export const App: React.FC = () => {
           try {
             const parsed = JSON.parse(cachedUser) as UserProfile;
             setUser(parsed);
-            if (activeTabRef.current === 'landing') {
+            if (activeTabRef.current === 'landing' || activeTabRef.current === 'onboarding') {
               setActiveTab(parsed.isOnboarded ? 'dashboard' : 'onboarding');
             }
           } catch (e) {
@@ -84,12 +98,12 @@ export const App: React.FC = () => {
 
         // Subscribe to User profile changes in Firestore
         const userDocRef = doc(db, 'users', firebaseUser.uid);
-        const unsubscribeUser = onSnapshot(userDocRef, (docSnap) => {
+        unsubscribeUserRef.current = onSnapshot(userDocRef, (docSnap) => {
           if (docSnap.exists()) {
             const data = docSnap.data() as UserProfile;
             setUser(data);
             localStorage.setItem('ecolens_user', JSON.stringify(data));
-            if (activeTabRef.current === 'landing') {
+            if (activeTabRef.current === 'landing' || activeTabRef.current === 'onboarding') {
               setActiveTab(data.isOnboarded ? 'dashboard' : 'onboarding');
             }
           } else {
@@ -120,7 +134,7 @@ export const App: React.FC = () => {
             try {
               const parsed = JSON.parse(cached) as UserProfile;
               setUser(parsed);
-              if (activeTabRef.current === 'landing') {
+              if (activeTabRef.current === 'landing' || activeTabRef.current === 'onboarding') {
                 setActiveTab(parsed.isOnboarded ? 'dashboard' : 'onboarding');
               }
             } catch (e) {
@@ -135,7 +149,7 @@ export const App: React.FC = () => {
 
         // Subscribe to logs collection changes in Firestore
         const logsColRef = collection(db, 'users', firebaseUser.uid, 'logs');
-        const unsubscribeLogs = onSnapshot(logsColRef, (querySnap) => {
+        unsubscribeLogsRef.current = onSnapshot(logsColRef, (querySnap) => {
           const list: EmissionsLog[] = [];
           querySnap.forEach((d) => {
             list.push(d.data() as EmissionsLog);
@@ -152,11 +166,6 @@ export const App: React.FC = () => {
           const cached = localStorage.getItem('ecolens_logs');
           if (cached) setLogs(JSON.parse(cached));
         });
-
-        return () => {
-          unsubscribeUser();
-          unsubscribeLogs();
-        };
       } else {
         setIsLoggedIn(false);
         setUser(mockAuth.getCurrentUser());
@@ -165,7 +174,11 @@ export const App: React.FC = () => {
       }
     });
 
-    return () => unsubscribeAuth();
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeUserRef.current) unsubscribeUserRef.current();
+      if (unsubscribeLogsRef.current) unsubscribeLogsRef.current();
+    };
   }, []);
 
   // Sync secondary localStorage states
@@ -415,6 +428,7 @@ export const App: React.FC = () => {
         initialMode={authInitialMode}
         onSuccess={(newUser, isNewUser) => {
           setUser(newUser);
+          setIsLoggedIn(true);
           setShowAuthModal(false);
           if (isNewUser) {
             setActiveTab('onboarding');
