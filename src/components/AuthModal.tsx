@@ -31,10 +31,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [nameInput, setNameInput] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
 
+  const [prevIsOpen, setPrevIsOpen] = useState<boolean>(isOpen);
   const [prevInitialMode, setPrevInitialMode] = useState<'login' | 'signup'>(initialMode);
-  if (initialMode !== prevInitialMode) {
+
+  if (isOpen !== prevIsOpen || initialMode !== prevInitialMode) {
+    setPrevIsOpen(isOpen);
     setPrevInitialMode(initialMode);
-    setAuthMode(initialMode);
+    if (isOpen) {
+      setAuthMode(initialMode);
+      setAuthError(null);
+      setEmailInput('');
+      setPasswordInput('');
+      setNameInput('');
+    }
   }
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
@@ -195,30 +204,53 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   const handleGoogleSignInClick = async () => {
+    setAuthError(null);
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const firebaseUser = result.user;
       
       const userDocRef = doc(db, 'users', firebaseUser.uid);
-      const userDoc = await getDoc(userDocRef);
-      
-      if (!userDoc.exists()) {
-        const googleUser: UserProfile = {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email || 'alex.rivers@gmail.com',
-          displayName: firebaseUser.displayName || 'Alex Rivers',
-          photoURL: firebaseUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-          greenPoints: 240,
-          xp: 120,
-          level: 1,
-          badges: ['badge_1'],
-          isOnboarded: false, // Let them complete onboarding
-        };
-        await setDoc(userDocRef, googleUser);
-        onSuccess(googleUser, true);
-      } else {
-        const data = userDoc.data() as UserProfile;
-        onSuccess(data, !data.isOnboarded);
+      try {
+        const userDoc = await getDoc(userDocRef);
+        
+        if (!userDoc.exists()) {
+          const googleUser: UserProfile = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || 'alex.rivers@gmail.com',
+            displayName: firebaseUser.displayName || 'Alex Rivers',
+            photoURL: firebaseUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+            greenPoints: 240,
+            xp: 120,
+            level: 1,
+            badges: ['badge_1'],
+            isOnboarded: false, // Let them complete onboarding
+          };
+          await setDoc(userDocRef, googleUser);
+          onSuccess(googleUser, true);
+        } else {
+          const data = userDoc.data() as UserProfile;
+          onSuccess(data, !data.isOnboarded);
+        }
+      } catch (dbErr) {
+        console.warn("Could not read user profile from Firestore, falling back to local settings:", dbErr);
+        const cached = localStorage.getItem('ecolens_user');
+        if (cached) {
+          const parsed = JSON.parse(cached) as UserProfile;
+          onSuccess(parsed, !parsed.isOnboarded);
+        } else {
+          const googleUser: UserProfile = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || 'alex.rivers@gmail.com',
+            displayName: firebaseUser.displayName || 'Alex Rivers',
+            photoURL: firebaseUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+            greenPoints: 240,
+            xp: 120,
+            level: 1,
+            badges: ['badge_1'],
+            isOnboarded: false,
+          };
+          onSuccess(googleUser, true);
+        }
       }
       
       confetti({
@@ -228,8 +260,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       });
     } catch (err) {
       console.error("Google Auth error:", err);
-      const errVal = err as { message?: string };
-      alert(errVal.message || "Google Sign-In failed.");
+      const errVal = err as { code?: string; message?: string };
+      const errMsg = getAuthErrorMessage(errVal.code || '', errVal.message || "Google Sign-In failed.");
+      setAuthError(errMsg);
     }
   };
 
